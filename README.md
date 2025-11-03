@@ -37,3 +37,17 @@ Une plateforme e-commerce moderne développée avec Django, proposant une expér
    ```bash
    git clone https://github.com/votre-username/kadershop.git
    cd kadershop
+
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
+
+pip install -r requirements.txt
+
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py createsuperuser
+
+python manage.py runserver 8080
