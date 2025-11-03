@@ -1,16 +1,113 @@
 {% extends "base.html" %}
 
-{% block title %}Mes Commandes - MonShop{% endblock %}
+{% block title %}Mes Commandes - KaderShop{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Mes Commandes</h2>
+<style>
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--black);
+    }
+    
+    .orders-card {
+        border: 2px solid var(--black);
+    }
+    
+    .orders-table {
+        border: 2px solid var(--black);
+        background: var(--white);
+    }
+    
+    .orders-table thead {
+        background: var(--black);
+        color: var(--white);
+    }
+    
+    .orders-table th, .orders-table td {
+        padding: 1.25rem;
+        vertical-align: middle;
+        border: 1px solid var(--black);
+    }
+    
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--black);
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+    
+    .status-delivered {
+        background: var(--black);
+        color: var(--white);
+    }
+    
+    .status-cancelled {
+        background: var(--white);
+        color: var(--black);
+    }
+    
+    .status-pending {
+        background: var(--gray-medium);
+        color: var(--black);
+    }
+    
+    .status-processing {
+        background: var(--gray-light);
+        color: var(--black);
+        border: 2px solid var(--black);
+    }
+    
+    .status-shipped {
+        background: var(--gray-dark);
+        color: var(--white);
+    }
+    
+    .payment-badge {
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--black);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .payment-paid {
+        background: var(--black);
+        color: var(--white);
+    }
+    
+    .payment-pending {
+        background: var(--white);
+        color: var(--black);
+    }
+    
+    .discount-info {
+        color: #666;
+        font-size: 0.85rem;
+    }
+    
+    .empty-orders {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-orders i {
+        font-size: 5rem;
+        color: #ccc;
+        margin-bottom: 2rem;
+    }
+</style>
+
+<h1 class="page-title">Mes Commandes</h1>
 
 {% if orders %}
-<div class="card">
+<div class="orders-card card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="orders-table table mb-0">
+                <thead>
                     <tr>
                         <th>N° Commande</th>
                         <th>Date</th>
@@ -24,29 +121,36 @@
                 <tbody>
                     {% for order in orders %}
                     <tr>
-                        <td>#{{ order.id }}</td>
+                        <td><strong>#{{ order.id }}</strong></td>
                         <td>{{ order.created|date:"d/m/Y" }}</td>
-                        <td>{{ order.get_total_cost }} €</td>
+                        <td><strong>{{ order.get_total_cost }}€</strong></td>
                         <td>
                             {% if order.discount_amount > 0 %}
-                            <span class="text-success">-{{ order.discount_amount }} €</span>
-                            {% if order.coupon %}
-                            <br><small class="text-muted">{{ order.coupon.code }}</small>
-                            {% endif %}
+                            <div>
+                                <strong>-{{ order.discount_amount }}€</strong>
+                                {% if order.coupon %}
+                                <div class="discount-info">{{ order.coupon.code }}</div>
+                                {% endif %}
+                            </div>
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
-                            <span class="badge bg-{{ order.get_status_display_class }}">
+                            <span class="status-badge 
+                                {% if order.status == 'delivered' %}status-delivered
+                                {% elif order.status == 'cancelled' %}status-cancelled
+                                {% elif order.status == 'processing' %}status-processing
+                                {% elif order.status == 'shipped' %}status-shipped
+                                {% else %}status-pending{% endif %}">
                                 {{ order.get_status_display }}
                             </span>
                         </td>
                         <td>
                             {% if order.paid %}
-                            <span class="badge bg-success">Payée</span>
+                            <span class="payment-badge payment-paid">Payée</span>
                             {% else %}
-                            <span class="badge bg-warning">En attente</span>
+                            <span class="payment-badge payment-pending">En attente</span>
                             {% endif %}
                         </td>
                         <td>
@@ -62,11 +166,13 @@
     </div>
 </div>
 {% else %}
-<div class="text-center py-5">
-    <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
-    <h3 class="text-muted">Aucune commande</h3>
-    <p class="text-muted">Vous n'avez pas encore passé de commande.</p>
-    <a href="{% url 'shop:product_list' %}" class="btn btn-primary btn-lg">Découvrir la boutique</a>
+<div class="empty-orders">
+    <i class="fas fa-shopping-bag"></i>
+    <h2 class="mb-3">Aucune commande</h2>
+    <p class="text-muted mb-4">Vous n'avez pas encore passé de commande.</p>
+    <a href="{% url 'shop:product_list' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-store"></i> Découvrir la boutique
+    </a>
 </div>
 {% endif %}
 {% endblock %}

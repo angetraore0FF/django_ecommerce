@@ -2,81 +2,43 @@
 
 {% block title %}Tableau de Bord Vendeur - KaderShop{% endblock %}
 
-{% block page_title %}Tableau de Bord Vendeur{% endblock %}
+{% block page_title %}Tableau de Bord{% endblock %}
 
 {% block content %}
 <div class="row">
     <!-- Cartes de statistiques -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card border-left-primary shadow h-100 py-2">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Produits
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_products }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-box fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+                <div class="stat-label">Produits</div>
+                <div class="stat-value">{{ total_products }}</div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card border-left-success shadow h-100 py-2">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Chiffre d'affaires
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_sales }} €</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+                <div class="stat-label">Chiffre d'affaires</div>
+                <div class="stat-value">{{ total_sales }} €</div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card border-left-info shadow h-100 py-2">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                            Commandes en cours
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            {{ recent_orders|length }}
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+                <div class="stat-label">Commandes en cours</div>
+                <div class="stat-value">{{ recent_orders|length }}</div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card border-left-warning shadow h-100 py-2">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            Produits populaires
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ top_products|length }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-star fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+                <div class="stat-label">Produits populaires</div>
+                <div class="stat-value">{{ top_products|length }}</div>
             </div>
         </div>
     </div>
@@ -85,9 +47,9 @@
 <div class="row">
     <!-- Commandes récentes -->
     <div class="col-lg-8 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">Commandes récentes</h6>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6>Commandes récentes</h6>
                 <a href="{% url 'shop:vendor_orders' %}" class="btn btn-sm btn-outline-primary">
                     Voir toutes
                 </a>
@@ -95,7 +57,7 @@
             <div class="card-body">
                 {% if recent_orders %}
                 <div class="table-responsive">
-                    <table class="table table-bordered" width="100%" cellspacing="0">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>Commande</th>
@@ -108,10 +70,10 @@
                         <tbody>
                             {% for item in recent_orders %}
                             <tr>
-                                <td>#{{ item.order.id }}</td>
+                                <td><strong>#{{ item.order.id }}</strong></td>
                                 <td>{{ item.product.name }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>{{ item.get_cost }} €</td>
+                                <td><strong>{{ item.get_cost }} €</strong></td>
                                 <td>{{ item.order.created|date:"d/m/Y" }}</td>
                             </tr>
                             {% endfor %}
@@ -119,7 +81,9 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted">Aucune commande récente.</p>
+                <div class="text-center py-5">
+                    <p style="color: #86868b;">Aucune commande récente.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -127,40 +91,42 @@
 
     <!-- Produits populaires -->
     <div class="col-lg-4 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Produits populaires</h6>
+        <div class="card">
+            <div class="card-header">
+                <h6>Produits populaires</h6>
             </div>
             <div class="card-body">
                 {% if top_products %}
-                <div class="list-group">
+                <div class="list-group" style="border: none;">
                     {% for product in top_products %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ product.product__name }}</span>
-                        <span class="badge bg-primary rounded-pill">{{ product.total_sold }}</span>
+                    <div class="d-flex justify-content-between align-items-center" style="padding: 16px 0; border-bottom: 1px solid #d2d2d7;">
+                        <span style="font-size: 15px;">{{ product.product__name }}</span>
+                        <span class="badge bg-primary">{{ product.total_sold }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-muted">Aucune vente pour le moment.</p>
+                <div class="text-center py-4">
+                    <p style="color: #86868b;">Aucune vente pour le moment.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Actions rapides -->
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Actions rapides</h6>
+        <div class="card">
+            <div class="card-header">
+                <h6>Actions rapides</h6>
             </div>
             <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-success">
+                <div class="d-grid gap-3">
+                    <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Ajouter un produit
                     </a>
                     <a href="{% url 'shop:vendor_products' %}" class="btn btn-outline-primary">
                         <i class="fas fa-box me-2"></i>Gérer mes produits
                     </a>
-                    <a href="{% url 'shop:vendor_orders' %}" class="btn btn-outline-info">
+                    <a href="{% url 'shop:vendor_orders' %}" class="btn btn-outline-primary">
                         <i class="fas fa-shopping-cart me-2"></i>Voir les commandes
                     </a>
                 </div>

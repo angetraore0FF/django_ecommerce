@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from . import vendors
-
+from django.conf.urls.static import static
+from django.conf import settings
 app_name = 'shop'
 
 urlpatterns = [
@@ -52,3 +53,5 @@ urlpatterns = [
     path('vendor/earnings/', vendors.vendor_earnings, name='vendor_earnings'),
     path('vendor/api/sales-statistics/', vendors.vendor_sales_statistics_api, name='vendor_sales_statistics_api'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

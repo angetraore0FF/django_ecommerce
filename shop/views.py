@@ -18,23 +18,42 @@ from django.utils.decorators import method_decorator
 
 
 # Vues Produits
+# Vues Produits
 def product_list(request, category_slug=None):
     category = None
     categories = Category.objects.all()
     products = Product.objects.filter(available=True)
+    
+    # RECHERCHE PAR NOM
+    search_query = request.GET.get('search', '')
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+    
+    # TRI DES PRODUITS
+    sort_by = request.GET.get('sort', 'created')
+    if sort_by == 'price_asc':
+        products = products.order_by('price')
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_by == 'name':
+        products = products.order_by('name')
+    else:  # Par défaut : plus récents
+        products = products.order_by('-created')
     
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     
     # Produits phares (ex: les 4 derniers produits)
-    featured_products = products.order_by('-created')[:4]
+    featured_products = Product.objects.filter(available=True).order_by('-created')[:4]
     
     return render(request, 'shop/product/list_apple.html', {
         'category': category,
         'categories': categories,
         'products': products,
-        'featured_products': featured_products
+        'featured_products': featured_products,
+        'search_query': search_query,
+        'sort_by': sort_by
     })
 
 def product_detail(request, id, slug):

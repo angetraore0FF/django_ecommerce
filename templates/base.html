@@ -1,91 +1,317 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <title>{% block title %}KaderShop{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
+    
     <style>
-        /* Styles pour les codes promo */
-        .coupon-success {
-            border-left: 4px solid #28a745;
-            background-color: #f8fff9;
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray-medium: #e0e0e0;
+            --gray-dark: #333333;
         }
-
-        .coupon-info {
-            border-left: 4px solid #17a2b8;
-            background-color: #f0f9ff;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--black);
+            background-color: var(--white);
+            line-height: 1.6;
         }
-
-        .discount-badge {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            font-weight: bold;
+        
+        /* Navigation */
+        .navbar {
+            background-color: var(--black) !important;
+            border-bottom: 1px solid var(--black);
+            padding: 1rem 0;
         }
-
-        .free-shipping-badge {
-            background: linear-gradient(45deg, #007bff, #6f42c1);
-            color: white;
-            font-weight: bold;
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
         }
-
-        /* Styles pour les produits phares */
-        .featured-products {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        
+        .nav-link {
+            color: var(--white) !important;
+            font-weight: 400;
+            transition: opacity 0.2s;
         }
-
-        .product-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            border-radius: 15px;
+        
+        .nav-link:hover {
+            opacity: 0.7;
         }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        
+        /* Cartes */
+        .card {
+            border: 1px solid var(--black);
+            border-radius: 0;
+            background-color: var(--white);
+            transition: transform 0.2s;
         }
-
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background-color: var(--black);
+            color: var(--white);
+            border-bottom: 1px solid var(--black);
+            font-weight: 500;
+            padding: 1rem 1.25rem;
+        }
+        
+        /* Boutons */
+        .btn {
+            border-radius: 0;
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--black);
+            border: 2px solid var(--black);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--white);
+            border: 2px solid var(--black);
+            color: var(--black);
+        }
+        
+        .btn-outline-primary {
+            background-color: var(--white);
+            border: 2px solid var(--black);
+            color: var(--black);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--black);
+            border: 2px solid var(--black);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray-dark);
+            border: 2px solid var(--gray-dark);
+            color: var(--white);
+        }
+        
+        .btn-outline-secondary {
+            background-color: var(--white);
+            border: 2px solid var(--gray-dark);
+            color: var(--gray-dark);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--gray-dark);
+            color: var(--white);
+        }
+        
+        .btn-danger, .btn-outline-danger {
+            background-color: var(--white);
+            border: 2px solid var(--black);
+            color: var(--black);
+        }
+        
+        .btn-danger:hover, .btn-outline-danger:hover {
+            background-color: var(--black);
+            color: var(--white);
+        }
+        
+        .btn-success, .btn-outline-success {
+            background-color: var(--black);
+            border: 2px solid var(--black);
+            color: var(--white);
+        }
+        
+        /* Badges */
+        .badge {
+            border-radius: 0;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+        }
+        
+        .bg-success, .badge.bg-success {
+            background-color: var(--black) !important;
+            color: var(--white);
+        }
+        
+        .bg-danger, .badge.bg-danger {
+            background-color: var(--white) !important;
+            color: var(--black);
+            border: 1px solid var(--black);
+        }
+        
+        .bg-warning, .badge.bg-warning {
+            background-color: var(--gray-medium) !important;
+            color: var(--black);
+        }
+        
+        .bg-primary, .badge.bg-primary {
+            background-color: var(--black) !important;
+        }
+        
+        /* Alertes */
+        .alert {
+            border-radius: 0;
+            border: 2px solid var(--black);
+        }
+        
+        .alert-success {
+            background-color: var(--gray-light);
+            color: var(--black);
+        }
+        
+        .alert-danger {
+            background-color: var(--white);
+            color: var(--black);
+        }
+        
+        .alert-info {
+            background-color: var(--gray-light);
+            color: var(--black);
+        }
+        
+        .alert-warning {
+            background-color: var(--gray-medium);
+            color: var(--black);
+        }
+        
+        /* Tables */
+        .table {
+            color: var(--black);
+        }
+        
+        .table thead {
+            background-color: var(--black);
+            color: var(--white);
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: var(--gray-light);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: var(--gray-medium);
+        }
+        
+        /* Forms */
+        .form-control, .form-select {
+            border: 1px solid var(--black);
+            border-radius: 0;
+            color: var(--black);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--black);
+            box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Banner */
         .welcome-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
+            background-color: var(--black);
+            color: var(--white);
             padding: 2rem;
             margin-bottom: 2rem;
+            text-align: center;
         }
-
-        /* Styles pour le footer */
+        
+        .welcome-banner a {
+            color: var(--white);
+            text-decoration: underline;
+        }
+        
+        /* Product Cards */
+        .product-card {
+            border: 1px solid var(--black);
+            transition: transform 0.2s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .product-card img {
+            border-bottom: 1px solid var(--black);
+        }
+        
+        /* Footer */
         .footer {
-            background: #2c3e50;
-            color: white;
+            background-color: var(--black);
+            color: var(--white);
             margin-top: 4rem;
             padding: 3rem 0 1rem;
+            border-top: 2px solid var(--black);
         }
-
+        
         .footer a {
-            color: #ecf0f1;
+            color: var(--white);
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: opacity 0.2s;
         }
-
+        
         .footer a:hover {
-            color: #3498db;
+            opacity: 0.7;
         }
-
-        .social-links a {
-            display: inline-block;
-            margin: 0 10px;
-            font-size: 1.5rem;
+        
+        .footer h5 {
+            font-weight: 600;
+            margin-bottom: 1rem;
         }
-
-        .newsletter-form {
-            max-width: 400px;
+        
+        /* Dropdown */
+        .dropdown-menu {
+            border: 1px solid var(--black);
+            border-radius: 0;
+        }
+        
+        .dropdown-item {
+            color: var(--black);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--black);
+            color: var(--white);
+        }
+        
+        /* Text Colors */
+        .text-primary {
+            color: var(--black) !important;
+        }
+        
+        .text-muted {
+            color: var(--gray-dark) !important;
+        }
+        
+        /* Links */
+        a {
+            color: var(--black);
+        }
+        
+        a:hover {
+            color: var(--gray-dark);
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: var(--gray-dark);
         }
     </style>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="{% url 'shop:product_list' %}">
                 <i class="fas fa-store"></i> KaderShop
@@ -98,36 +324,33 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <!-- Dans base.html - Modifiez la partie du menu dropdown -->
-
-<div class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-        <i class="fas fa-user"></i> {{ user.first_name|default:user.username }}
-    </a>
-    <ul class="dropdown-menu">
-        {# ✅ MODIFICATION : Afficher l'espace vendeur SEULEMENT si l'utilisateur est vendeur #}
-        {% if user.profile.is_vendor or user.is_staff %}
-        <li><a class="dropdown-item" href="{% url 'shop:vendor_dashboard' %}">
-            <i class="fas fa-store me-2"></i> Espace Vendeur
-        </a></li>
-        <li><hr class="dropdown-divider"></li>
-        {% endif %}
-        
-        <li><a class="dropdown-item" href="{% url 'shop:profile' %}">
-            <i class="fas fa-user-circle"></i> Mon Profil
-        </a></li>
-        <li><a class="dropdown-item" href="{% url 'shop:order_history' %}">
-            <i class="fas fa-history"></i> Mes Commandes
-        </a></li>
-        <li><a class="dropdown-item" href="{% url 'shop:favorite_list' %}">
-            <i class="fas fa-heart"></i> Mes Favoris
-        </a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="{% url 'shop:logout' %}">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </a></li>
-    </ul>
-</div>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% if user.profile.is_vendor or user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'shop:vendor_dashboard' %}">
+                                    <i class="fas fa-store me-2"></i> Espace Vendeur
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                
+                                <li><a class="dropdown-item" href="{% url 'shop:profile' %}">
+                                    <i class="fas fa-user-circle"></i> Mon Profil
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'shop:order_history' %}">
+                                    <i class="fas fa-history"></i> Mes Commandes
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'shop:favorite_list' %}">
+                                    <i class="fas fa-heart"></i> Mes Favoris
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'shop:logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                </a></li>
+                            </ul>
+                        </div>
                     {% else %}
                         <a class="nav-link" href="{% url 'shop:login' %}">
                             <i class="fas fa-sign-in-alt"></i> Connexion
@@ -142,7 +365,6 @@
                         {% if cart and cart.items.count > 0 %}
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
                                 {{ cart.items.count }}
-                                <span class="visually-hidden">articles dans le panier</span>
                             </span>
                         {% endif %}
                     </a>
@@ -153,21 +375,9 @@
 
     <div class="container mt-4">
         {% if user.is_authenticated %}
-        <div class="welcome-banner text-center">
-            <h2>👋 Bienvenue, {{ user.first_name|default:user.username }} !</h2>
-            <p class="lead mb-0">Nous sommes ravis de vous revoir sur KaderShop</p>
-            <small>Profitez de nos meilleures offres et découvrez nos nouveautés</small>
-        </div>
-        {% else %}
-        <div class="welcome-banner text-center">
-            <h2>🛍️ Bienvenue sur KaderShop</h2>
-            <p class="lead mb-0">Votre destination shopping préférée</p>
-            <small>
-                <a href="{% url 'shop:login' %}" class="text-white fw-bold">Connectez-vous</a> 
-                ou 
-                <a href="{% url 'shop:register' %}" class="text-white fw-bold">inscrivez-vous</a> 
-                pour profiter de nos offres exclusives
-            </small>
+        <div class="welcome-banner">
+            <h2>Bienvenue, {{ user.first_name|default:user.username }}</h2>
+            <p class="mb-0">Explorez nos produits et profitez de votre expérience shopping</p>
         </div>
         {% endif %}
 
@@ -181,123 +391,6 @@
         {% endif %}
 
         {% block content %}
-        {% if request.path == '/' or request.path == '/shop/' %}
-        <section class="mb-5">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="text-center mb-4">🌟 <strong>Produits Phares</strong></h2>
-                    <p class="text-center text-muted mb-5">Découvrez nos articles les plus populaires</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            <img src="https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=Produit+1" 
-                                 class="card-img-top" alt="Produit Phare 1" style="height: 200px; object-fit: cover;">
-                            <span class="position-absolute top-0 start-0 bg-warning text-dark px-2 py-1 m-2 rounded">
-                                <i class="fas fa-star"></i> Populaire
-                            </span>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">Smartphone Premium</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                Dernier modèle avec écran AMOLED et triple appareil photo
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong class="text-primary">599€</strong>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-shopping-cart"></i> Acheter
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-4">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            <img src="https://via.placeholder.com/300x200/50E3C2/FFFFFF?text=Produit+2" 
-                                 class="card-img-top" alt="Produit Phare 2" style="height: 200px; object-fit: cover;">
-                            <span class="position-absolute top-0 start-0 bg-success text-white px-2 py-1 m-2 rounded">
-                                <i class="fas fa-bolt"></i> Nouveau
-                            </span>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">Casque Audio Pro</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                Réduction de bruit active, son haute fidélité
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong class="text-primary">249€</strong>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-shopping-cart"></i> Acheter
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-4">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            <img src="https://via.placeholder.com/300x200/9013FE/FFFFFF?text=Produit+3" 
-                                 class="card-img-top" alt="Produit Phare 3" style="height: 200px; object-fit: cover;">
-                            <span class="position-absolute top-0 start-0 bg-info text-white px-2 py-1 m-2 rounded">
-                                <i class="fas fa-fire"></i> Tendence
-                            </span>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">Montre Connectée</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                Suivi santé 24/7, autonomie 7 jours, étanche
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong class="text-primary">179€</strong>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-shopping-cart"></i> Acheter
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-4">
-                    <div class="card product-card h-100">
-                        <div class="position-relative">
-                            <img src="https://via.placeholder.com/300x200/F5A623/FFFFFF?text=Produit+4" 
-                                 class="card-img-top" alt="Produit Phare 4" style="height: 200px; object-fit: cover;">
-                            <span class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 m-2 rounded">
-                                <i class="fas fa-tag"></i> Promo -20%
-                            </span>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">Tablette Graphique</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                Parfaite pour designers et créateurs numériques
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong class="text-primary">199€</strong>
-                                    <small class="text-muted text-decoration-line-through ms-2">249€</small>
-                                </div>
-                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-shopping-cart"></i> Acheter
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-4">
-                <a href="{% url 'shop:product_list' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-store"></i> Voir tous les produits
-                </a>
-            </div>
-        </section>
-        {% endif %}
         {% endblock %}
     </div>
 
@@ -305,72 +398,40 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5>À propos de KaderShop</h5>
+                    <h5>KaderShop</h5>
                     <p class="mt-3">
-                        Votre boutique en ligne de confiance pour les produits high-tech et électroniques. 
-                        Qualité, prix imbattables et service client exceptionnel.
+                        Votre boutique en ligne de confiance.
                     </p>
-                    <div class="social-links mt-4">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    </div>
                 </div>
 
-                <div class="col-md-2 mb-4">
-                    <h5>Liens rapides</h5>
+                <div class="col-md-4 mb-4">
+                    <h5>Navigation</h5>
                     <ul class="list-unstyled mt-3">
                         <li class="mb-2"><a href="{% url 'shop:product_list' %}">Boutique</a></li>
-                        <li class="mb-2"><a href="#">Nouveautés</a></li>
-                        <li class="mb-2"><a href="#">Promotions</a></li>
-                        <li class="mb-2"><a href="#">À propos</a></li>
-                        <li class="mb-2"><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-3 mb-4">
-                    <h5>Mon compte</h5>
-                    <ul class="list-unstyled mt-3">
                         {% if user.is_authenticated %}
                             <li class="mb-2"><a href="{% url 'shop:profile' %}">Mon profil</a></li>
                             <li class="mb-2"><a href="{% url 'shop:order_history' %}">Mes commandes</a></li>
-                            <li class="mb-2"><a href="{% url 'shop:favorite_list' %}">Mes favoris</a></li>
                         {% else %}
                             <li class="mb-2"><a href="{% url 'shop:login' %}">Connexion</a></li>
                             <li class="mb-2"><a href="{% url 'shop:register' %}">Inscription</a></li>
                         {% endif %}
-                        <li class="mb-2"><a href="{% url 'shop:cart_detail' %}">Mon panier</a></li>
                     </ul>
                 </div>
 
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <p class="mt-3">Inscrivez-vous pour recevoir nos offres exclusives</p>
-                    <form class="newsletter-form">
-                        <div class="input-group mb-3">
-                            <input type="email" class="form-control" placeholder="Votre email" required>
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </form>
-                    <small class="text-muted">
-                        <i class="fas fa-lock"></i> Nous respectons votre vie privée
-                    </small>
+                <div class="col-md-4 mb-4">
+                    <h5>Contact</h5>
+                    <p class="mt-3">
+                        Email: contact@kadershop.com<br>
+                        Téléphone: +225 XX XX XX XX
+                    </p>
                 </div>
             </div>
 
-            <hr style="border-color: #4a6572;">
+            <hr style="border-color: #ffffff33;">
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-12 text-center">
                     <p class="mb-0">&copy; 2025 KaderShop. Tous droits réservés.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="me-3">Mentions légales</a>
-                    <a href="#" class="me-3">Politique de confidentialité</a>
-                    <a href="#">Conditions générales</a>
                 </div>
             </div>
         </div>
@@ -380,7 +441,6 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Gestion des favoris avec AJAX
         const favoriteButtons = document.querySelectorAll('.favorite-btn');
         
         favoriteButtons.forEach(button => {
@@ -398,24 +458,21 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Mettre à jour l'icône
                     const icon = this.querySelector('i');
                     if (data.is_favorite) {
-                        icon.className = 'fas fa-heart text-danger';
+                        icon.className = 'fas fa-heart';
                         this.title = 'Retirer des favoris';
                     } else {
                         icon.className = 'far fa-heart';
                         this.title = 'Ajouter aux favoris';
                     }
                     
-                    // Afficher le message
                     if (data.message) {
                         showToast(data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Fallback: redirection normale
                     window.location.href = url;
                 });
             });
@@ -437,12 +494,11 @@
         }
         
         function showToast(message) {
-            // Créer un toast simple
             const toast = document.createElement('div');
             toast.className = 'position-fixed bottom-0 end-0 p-3';
             toast.style.zIndex = '11';
             toast.innerHTML = `
-                <div class="toast show" role="alert">
+                <div class="toast show bg-black text-white border-0" role="alert">
                     <div class="toast-body">
                         ${message}
                     </div>
@@ -450,7 +506,6 @@
             `;
             document.body.appendChild(toast);
             
-            // Supprimer le toast après 3 secondes
             setTimeout(() => {
                 toast.remove();
             }, 3000);

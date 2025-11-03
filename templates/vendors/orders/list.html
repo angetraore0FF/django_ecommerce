@@ -5,38 +5,38 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h5 class="mb-0">Commandes des clients</h5>
+    <h5 style="font-size: 24px; font-weight: 600; margin: 0;">Commandes des clients</h5>
     
     <div class="btn-group">
         <a href="{% url 'shop:vendor_orders' %}" 
-           class="btn btn-outline-primary {% if status_filter == 'all' %}active{% endif %}">
+           class="btn btn-sm {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
             Toutes
         </a>
         <a href="{% url 'shop:vendor_orders' %}?status=pending" 
-           class="btn btn-outline-warning {% if status_filter == 'pending' %}active{% endif %}">
+           class="btn btn-sm {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}">
             En attente
         </a>
         <a href="{% url 'shop:vendor_orders' %}?status=processing" 
-           class="btn btn-outline-info {% if status_filter == 'processing' %}active{% endif %}">
+           class="btn btn-sm {% if status_filter == 'processing' %}btn-primary{% else %}btn-outline-primary{% endif %}">
             En traitement
         </a>
         <a href="{% url 'shop:vendor_orders' %}?status=shipped" 
-           class="btn btn-outline-primary {% if status_filter == 'shipped' %}active{% endif %}">
+           class="btn btn-sm {% if status_filter == 'shipped' %}btn-primary{% else %}btn-outline-primary{% endif %}">
             Expédiées
         </a>
         <a href="{% url 'shop:vendor_orders' %}?status=delivered" 
-           class="btn btn-outline-success {% if status_filter == 'delivered' %}active{% endif %}">
+           class="btn btn-sm {% if status_filter == 'delivered' %}btn-primary{% else %}btn-outline-primary{% endif %}">
             Livrées
         </a>
     </div>
 </div>
 
-<div class="card shadow">
-    <div class="card-body">
+<div class="card">
+    <div class="card-body" style="padding: 0;">
         {% if order_items %}
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table">
+                <thead>
                     <tr>
                         <th>Commande</th>
                         <th>Client</th>
@@ -56,15 +56,14 @@
                             <strong>#{{ item.order.id }}</strong>
                         </td>
                         <td>
-                            {{ item.order.first_name }} {{ item.order.last_name }}
-                            <br>
-                            <small class="text-muted">{{ item.order.email }}</small>
+                            <div style="font-weight: 500;">{{ item.order.first_name }} {{ item.order.last_name }}</div>
+                            <small style="color: #86868b;">{{ item.order.email }}</small>
                         </td>
                         <td>
-                            <div class="d-flex align-items-center">
+                            <div style="display: flex; align-items: center;">
                                 {% if item.product.image %}
                                 <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
-                                     class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                     style="width: 48px; height: 48px; object-fit: cover; border-radius: 10px; margin-right: 12px;">
                                 {% endif %}
                                 <div>
                                     <strong>{{ item.product.name }}</strong>
@@ -74,12 +73,11 @@
                         <td>{{ item.quantity }}</td>
                         <td>{{ item.price }} €</td>
                         <td>
-                            <strong class="text-primary">{{ item.get_cost }} €</strong>
+                            <strong>{{ item.get_cost }} €</strong>
                         </td>
                         <td>
-                            {{ item.order.created|date:"d/m/Y" }}
-                            <br>
-                            <small class="text-muted">{{ item.order.created|date:"H:i" }}</small>
+                            <div>{{ item.order.created|date:"d/m/Y" }}</div>
+                            <small style="color: #86868b;">{{ item.order.created|date:"H:i" }}</small>
                         </td>
                         <td>
                             <span class="badge bg-{{ item.order.get_status_display_class }}">
@@ -98,10 +96,10 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
-            <h5 class="text-muted">Aucune commande</h5>
-            <p class="text-muted">
+        <div class="text-center" style="padding: 80px 24px;">
+            <i class="fas fa-shopping-cart fa-4x mb-4" style="color: #d2d2d7;"></i>
+            <h5 style="color: #1d1d1f; margin-bottom: 12px;">Aucune commande</h5>
+            <p style="color: #86868b;">
                 {% if status_filter != 'all' %}
                 Aucune commande avec le statut "{{ status_filter }}"
                 {% else %}
@@ -116,93 +114,57 @@
 <!-- Statistiques des commandes -->
 <div class="row mt-4">
     <div class="col-md-3">
-        <div class="card bg-primary text-white shadow">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                            Commandes totales
-                        </div>
-                        <div class="h5 mb-0">{{ order_items|length }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-shopping-cart fa-2x"></i>
-                    </div>
+                <div class="stat-label">Commandes totales</div>
+                <div class="stat-value">{{ order_items|length }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Chiffre d'affaires</div>
+                <div class="stat-value">
+                    {% with total=0 %}
+                        {% for item in order_items %}
+                            {% widthratio item.get_cost 1 1 as item_total %}
+                            {{ item_total|add:total }}
+                        {% endfor %}
+                    {% endwith %} €
                 </div>
             </div>
         </div>
     </div>
     
     <div class="col-md-3">
-        <div class="card bg-success text-white shadow">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                            Chiffre d'affaires
-                        </div>
-                        <div class="h5 mb-0">
-                            {% with total=0 %}
-                                {% for item in order_items %}
-                                    {% widthratio item.get_cost 1 1 as item_total %}
-                                    {{ item_total|add:total }}
-                                {% endfor %}
-                            {% endwith %} €
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-euro-sign fa-2x"></i>
-                    </div>
+                <div class="stat-label">En attente</div>
+                <div class="stat-value">
+                    {% with pending=0 %}
+                        {% for item in order_items %}
+                            {% if item.order.status == 'pending' %}
+                                {{ pending|add:1 }}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
                 </div>
             </div>
         </div>
     </div>
     
     <div class="col-md-3">
-        <div class="card bg-warning text-white shadow">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                            En attente
-                        </div>
-                        <div class="h5 mb-0">
-                            {% with pending=0 %}
-                                {% for item in order_items %}
-                                    {% if item.order.status == 'pending' %}
-                                        {{ pending|add:1 }}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-clock fa-2x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-info text-white shadow">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">
-                            Produits vendus
-                        </div>
-                        <div class="h5 mb-0">
-                            {% with total_quantity=0 %}
-                                {% for item in order_items %}
-                                    {{ item.quantity|add:total_quantity }}
-                                {% endfor %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-box fa-2x"></i>
-                    </div>
+                <div class="stat-label">Produits vendus</div>
+                <div class="stat-value">
+                    {% with total_quantity=0 %}
+                        {% for item in order_items %}
+                            {{ item.quantity|add:total_quantity }}
+                        {% endfor %}
+                    {% endwith %}
                 </div>
             </div>
         </div>

@@ -6,80 +6,80 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-8">
-        <div class="card shadow">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Modifier "{{ product.name }}"</h5>
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit me-2"></i>Modifier "{{ product.name }}"</h5>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom du produit *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom du produit</label>
                             {{ form.name }}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.category.id_for_label }}" class="form-label">Catégorie *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Catégorie</label>
                             {{ form.category }}
                         </div>
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug</label>
                             {{ form.slug }}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.price.id_for_label }}" class="form-label">Prix *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.price.id_for_label }}" class="form-label">Prix</label>
                             <div class="input-group">
                                 {{ form.price }}
-                                <span class="input-group-text">€</span>
+                                <span class="input-group-text" style="border-radius: 0 12px 12px 0; border: 1px solid #d2d2d7; border-left: none; background: #f5f5f7;">€</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
                         {{ form.description }}
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
                             {{ form.stock }}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-4">
                             <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
                             {{ form.image }}
                             {% if product.image %}
-                            <div class="mt-2">
-                                <small>Image actuelle :</small><br>
+                            <div class="mt-3">
+                                <small style="font-size: 13px; color: #86868b; display: block; margin-bottom: 8px;">Image actuelle :</small>
                                 <img src="{{ product.image.url }}" alt="{{ product.name }}" 
-                                     class="img-thumbnail mt-1" style="max-height: 100px;">
+                                     style="max-height: 120px; border-radius: 12px; border: 1px solid #d2d2d7;">
                             </div>
                             {% endif %}
                         </div>
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-5">
                         <div class="form-check form-switch">
                             {{ form.available }}
-                            <label class="form-check-label" for="{{ form.available.id_for_label }}">
+                            <label class="form-check-label" for="{{ form.available.id_for_label }}" style="font-size: 15px;">
                                 Produit disponible à la vente
                             </label>
                         </div>
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'shop:vendor_products' %}" class="btn btn-secondary me-md-2">
-                            <i class="fas fa-arrow-left me-2"></i>Annuler
+                        <a href="{% url 'shop:vendor_products' %}" class="btn btn-outline-primary">
+                            Annuler
                         </a>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-save me-2"></i>Mettre à jour
+                        <button type="submit" class="btn btn-primary">
+                            Mettre à jour
                         </button>
                     </div>
                 </form>
@@ -88,54 +88,56 @@
     </div>
     
     <div class="col-lg-4">
-        <div class="card shadow">
-            <div class="card-header bg-info text-white">
-                <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques du produit</h6>
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar me-2"></i>Statistiques</h6>
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
                     {% if product.image %}
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" 
-                         class="img-fluid rounded" style="max-height: 150px;">
+                         style="max-height: 180px; border-radius: 12px;">
                     {% else %}
-                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                         style="height: 150px;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
+                    <div style="height: 180px; background: #f5f5f7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image fa-3x" style="color: #d2d2d7;"></i>
                     </div>
                     {% endif %}
                 </div>
                 
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <div class="border rounded p-2">
-                            <div class="h5 mb-1 text-primary">{{ product.average_rating }}</div>
-                            <small class="text-muted">Note moyenne</small>
+                <div class="row text-center" style="margin-bottom: 24px;">
+                    <div class="col-6">
+                        <div style="padding: 16px; border: 1px solid #d2d2d7; border-radius: 12px;">
+                            <div style="font-size: 24px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">{{ product.average_rating }}</div>
+                            <small style="color: #86868b;">Note moyenne</small>
                         </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <div class="border rounded p-2">
-                            <div class="h5 mb-1 text-success">{{ product.review_count }}</div>
-                            <small class="text-muted">Avis</small>
+                    <div class="col-6">
+                        <div style="padding: 16px; border: 1px solid #d2d2d7; border-radius: 12px;">
+                            <div style="font-size: 24px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">{{ product.review_count }}</div>
+                            <small style="color: #86868b;">Avis</small>
                         </div>
                     </div>
                 </div>
                 
-                <div class="mt-3">
-                    <small class="text-muted">Créé le : {{ product.created|date:"d/m/Y" }}</small><br>
-                    <small class="text-muted">Dernière modification : {{ product.updated|date:"d/m/Y" }}</small>
+                <div style="padding-top: 20px; border-top: 1px solid #d2d2d7;">
+                    <small style="color: #86868b; display: block; margin-bottom: 8px;">Créé le : {{ product.created|date:"d/m/Y" }}</small>
+                    <small style="color: #86868b; display: block;">Dernière modification : {{ product.updated|date:"d/m/Y" }}</small>
                 </div>
             </div>
         </div>
         
-        <div class="card shadow mt-4">
-            <div class="card-header bg-danger text-white">
-                <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Zone dangereuse</h6>
+        <div class="card" style="border-color: #ff3b30;">
+            <div class="card-header" style="border-bottom-color: #ff3b30;">
+                <h6 style="color: #ff3b30;"><i class="fas fa-exclamation-triangle me-2"></i>Zone dangereuse</h6>
             </div>
             <div class="card-body">
-                <p class="small text-muted mb-3">
+                <p style="font-size: 14px; color: #86868b; margin-bottom: 16px;">
                     La suppression est irréversible. Toutes les données associées à ce produit seront perdues.
                 </p>
-                <button class="btn btn-outline-danger btn-sm w-100" 
+                <button class="btn btn-outline-primary w-100" 
+                        style="border-color: #ff3b30; color: #ff3b30;"
+                        onmouseover="this.style.background='#ff3b30'; this.style.color='#ffffff';"
+                        onmouseout="this.style.background='transparent'; this.style.color='#ff3b30';"
                         onclick="confirmDelete('{{ product.id }}', '{{ product.name }}')">
                     <i class="fas fa-trash me-2"></i>Supprimer ce produit
                 </button>

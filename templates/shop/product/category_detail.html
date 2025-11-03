@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - KaderShop{% endblock %}
+
+{% block content %}
+<style>
+    .filter-section {
+        background: white;
+        border: 2px solid var(--black);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 3rem 0.75rem 1rem;
+        border: 2px solid var(--black);
+        font-size: 1rem;
+    }
+    
+    .search-btn {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--black);
+    }
+    
+    .sort-select {
+        padding: 0.75rem;
+        border: 2px solid var(--black);
+        background: white;
+        width: 100%;
+    }
+    
+    .results-info {
+        background: var(--gray-light);
+        padding: 1rem;
+        border: 2px solid var(--black);
+        margin-bottom: 2rem;
+    }
+</style>
+
+<div class="container-apple">
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}">Accueil</a></li>
+            <li class="breadcrumb-item active">{{ category.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- En-tête de la catégorie -->
+    <div class="text-center mb-5">
+        <h1 class="section-title" style="font-size: 40px;">{{ category.name }}</h1>
+        <p class="section-subtitle" style="font-size: 21px;">
+            {{ products.count }} produit(s) disponible(s)
+        </p>
+    </div>
+    
+    <!-- Filtres et recherche -->
+    <div class="filter-section">
+        <div class="row g-3">
+            <!-- Recherche -->
+            <div class="col-md-6">
+                <form method="get" class="search-box">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search_query }}"
+                           class="search-input" 
+                           placeholder="Rechercher dans {{ category.name }}...">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Tri -->
+            <div class="col-md-6">
+                <form method="get" id="sort-form">
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    <select name="sort" class="sort-select" onchange="document.getElementById('sort-form').submit()">
+                        <option value="created" {% if sort_by == 'created' %}selected{% endif %}>Plus récents</option>
+                        <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Prix croissant</option>
+                        <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Prix décroissant</option>
+                        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Nom A-Z</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Résultats de recherche -->
+    {% if search_query %}
+    <div class="results-info">
+        <p class="mb-0">
+            <strong>Résultats pour "{{ search_query }}"</strong> - 
+            {{ products.count }} produit(s) trouvé(s)
+            <a href="?sort={{ sort_by }}" class="btn-apple-outline btn-sm ms-3">Voir tout</a>
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- Liste des produits -->
+    <div class="row g-4">
+        {% for product in products %}
+            <div class="col-lg-3 col-md-6">
+                <div class="product-card-apple h-100 d-flex flex-column">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-image d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <h3 class="product-title">{{ product.name }}</h3>
+                        <p class="product-description flex-grow-1">
+                            {{ product.description|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="product-price">{{ product.price }} €</span>
+                                {% if product.stock > 0 %}
+                                    <span class="badge-apple">En stock</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Rupture</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'shop:product_detail' product.id product.slug %}" class="btn-apple-outline">
+                                    Découvrir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h3 class="text-gradient">Aucun produit trouvé</h3>
+                <p class="text-muted">
+                    {% if search_query %}
+                        Aucun produit ne correspond à votre recherche "{{ search_query }}"
+                    {% else %}
+                        Aucun produit disponible dans cette catégorie pour le moment.
+                    {% endif %}
+                </p>
+                <a href="{% url 'shop:product_list' %}" class="btn-apple mt-3">
+                    Retour à l'accueil
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

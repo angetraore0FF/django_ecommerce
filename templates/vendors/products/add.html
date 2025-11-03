@@ -6,114 +6,124 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Nouveau Produit</h5>
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus me-2"></i>Nouveau Produit</h5>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom du produit *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom du produit</label>
                             {{ form.name }}
                             {% if form.name.errors %}
-                                <div class="text-danger small">{{ form.name.errors }}</div>
+                                <div class="text-danger small mt-2">{{ form.name.errors }}</div>
                             {% endif %}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.category.id_for_label }}" class="form-label">Catégorie *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Catégorie</label>
                             {{ form.category }}
                             {% if form.category.errors %}
-                                <div class="text-danger small">{{ form.category.errors }}</div>
+                                <div class="text-danger small mt-2">{{ form.category.errors }}</div>
                             {% endif %}
                         </div>
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug</label>
                             {{ form.slug }}
-                            <small class="form-text text-muted">
-                                Identifiant unique pour l'URL (lettres, chiffres, traits d'union)
+                            <small style="font-size: 13px; color: #86868b; display: block; margin-top: 8px;">
+                                Identifiant unique pour l'URL
                             </small>
                             {% if form.slug.errors %}
-                                <div class="text-danger small">{{ form.slug.errors }}</div>
+                                <div class="text-danger small mt-2">{{ form.slug.errors }}</div>
                             {% endif %}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.price.id_for_label }}" class="form-label">Prix *</label>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.price.id_for_label }}" class="form-label">Prix</label>
                             <div class="input-group">
                                 {{ form.price }}
-                                <span class="input-group-text">€</span>
+                                <span class="input-group-text" style="border-radius: 0 12px 12px 0; border: 1px solid #d2d2d7; border-left: none; background: #f5f5f7;">€</span>
                             </div>
                             {% if form.price.errors %}
-                                <div class="text-danger small">{{ form.price.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                            <div class="text-danger small">{{ form.description.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock *</label>
-                            {{ form.stock }}
-                            {% if form.stock.errors %}
-                                <div class="text-danger small">{{ form.stock.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
-                            {{ form.image }}
-                            {% if form.image.errors %}
-                                <div class="text-danger small">{{ form.image.errors }}</div>
+                                <div class="text-danger small mt-2">{{ form.price.errors }}</div>
                             {% endif %}
                         </div>
                     </div>
                     
                     <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-2">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
+                            {{ form.stock }}
+                            {% if form.stock.errors %}
+                                <div class="text-danger small mt-2">{{ form.stock.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="text-danger small mt-2">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
                         <div class="form-check form-switch">
                             {{ form.available }}
-                            <label class="form-check-label" for="{{ form.available.id_for_label }}">
+                            <label class="form-check-label" for="{{ form.available.id_for_label }}" style="font-size: 15px;">
                                 Produit disponible à la vente
                             </label>
                         </div>
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'shop:vendor_products' %}" class="btn btn-secondary me-md-2">
-                            <i class="fas fa-arrow-left me-2"></i>Annuler
+                        <a href="{% url 'shop:vendor_products' %}" class="btn btn-outline-primary">
+                            Annuler
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Enregistrer le produit
+                            Enregistrer le produit
                         </button>
                     </div>
                 </form>
             </div>
         </div>
         
-        <div class="card shadow mt-4">
-            <div class="card-header bg-info text-white">
-                <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Conseils pour un bon produit</h6>
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-lightbulb me-2"></i>Conseils</h6>
             </div>
             <div class="card-body">
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-check text-success me-2"></i>Utilisez un nom clair et descriptif</li>
-                    <li><i class="fas fa-check text-success me-2"></i>Choisissez une image de qualité</li>
-                    <li><i class="fas fa-check text-success me-2"></i>Décrivez précisément les caractéristiques</li>
-                    <li><i class="fas fa-check text-success me-2"></i>Fixez un prix compétitif</li>
-                    <li><i class="fas fa-check text-success me-2"></i>Maintenez le stock à jour</li>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="padding: 12px 0; border-bottom: 1px solid #d2d2d7; font-size: 15px;">
+                        <i class="fas fa-check me-2" style="color: #34c759;"></i>Utilisez un nom clair et descriptif
+                    </li>
+                    <li style="padding: 12px 0; border-bottom: 1px solid #d2d2d7; font-size: 15px;">
+                        <i class="fas fa-check me-2" style="color: #34c759;"></i>Choisissez une image de qualité
+                    </li>
+                    <li style="padding: 12px 0; border-bottom: 1px solid #d2d2d7; font-size: 15px;">
+                        <i class="fas fa-check me-2" style="color: #34c759;"></i>Décrivez précisément les caractéristiques
+                    </li>
+                    <li style="padding: 12px 0; border-bottom: 1px solid #d2d2d7; font-size: 15px;">
+                        <i class="fas fa-check me-2" style="color: #34c759;"></i>Fixez un prix compétitif
+                    </li>
+                    <li style="padding: 12px 0; font-size: 15px;">
+                        <i class="fas fa-check me-2" style="color: #34c759;"></i>Maintenez le stock à jour
+                    </li>
                 </ul>
             </div>
         </div>

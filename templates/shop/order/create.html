@@ -1,174 +1,227 @@
 {% extends "base.html" %}
 
-{% block title %}Passer Commande - MonShop{% endblock %}
+{% block title %}Passer Commande - KaderShop{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="mb-0">Passer la commande</h2>
+<style>
+    .order-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .order-card {
+        border: 2px solid var(--black);
+    }
+    
+    .order-card-header {
+        background: var(--black);
+        color: var(--white);
+        padding: 1.25rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .summary-table {
+        border: 2px solid var(--black);
+    }
+    
+    .summary-table th, .summary-table td {
+        padding: 0.75rem;
+        border: 1px solid var(--black);
+    }
+    
+    .summary-table thead {
+        background: var(--black);
+        color: var(--white);
+    }
+    
+    .summary-table tfoot {
+        font-weight: 600;
+    }
+    
+    .summary-table tfoot tr:last-child {
+        background: var(--gray-light);
+        border-top: 2px solid var(--black);
+    }
+    
+    .coupon-info {
+        background: var(--gray-light);
+        border: 2px solid var(--black);
+        padding: 1rem;
+    }
+    
+    .form-section {
+        border-top: 2px solid var(--black);
+        padding-top: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="order-container">
+    <div class="order-card card">
+        <div class="order-card-header">
+            Passer la commande
+        </div>
+        <div class="card-body p-4">
+            <!-- Récapitulatif du panier -->
+            <div class="mb-4">
+                <h5 class="section-title">Récapitulatif de votre commande</h5>
+                <div class="table-responsive">
+                    <table class="summary-table table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Prix unitaire</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.product.price }}€</td>
+                                <td><strong>{{ item.get_total_price }}€</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end">Sous-total :</td>
+                                <td><strong>{{ cart.get_total_price }}€</strong></td>
+                            </tr>
+
+                            {% if cart.discount_amount > 0 %}
+                            <tr>
+                                <td colspan="3" class="text-end">
+                                    Réduction ({{ cart.coupon_code }}) :
+                                </td>
+                                <td><strong>-{{ cart.discount_amount }}€</strong></td>
+                            </tr>
+                            {% endif %}
+
+                            <tr>
+                                <td colspan="3" class="text-end">Livraison :</td>
+                                <td>
+                                    <strong>
+                                        {% if cart.coupon_type == 'free_shipping' %}
+                                        <span class="text-success">Gratuite</span>
+                                        {% else %}
+                                        {% if cart.shipping_cost > 0 %}
+                                        {{ cart.shipping_cost }}€
+                                        {% else %}
+                                        <span class="text-success">Gratuite</span>
+                                        {% endif %}
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="3" class="text-end fs-5">Total :</td>
+                                <td class="fs-5"><strong>{{ cart.final_total }}€</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- Récapitulatif du panier -->
-                <div class="mb-4">
-                    <h5>Récapitulatif de votre commande</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Produit</th>
-                                    <th>Quantité</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in cart.items.all %}
-                                <tr>
-                                    <td>{{ item.product.name }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td>{{ item.product.price }} €</td>
-                                    <td>{{ item.get_total_price }} €</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <!-- ✅ SOUS-TOTAL -->
-                                <tr>
-                                    <td colspan="3" class="text-end"><strong>Sous-total :</strong></td>
-                                    <td><strong>{{ cart.get_total_price }} €</strong></td>
-                                </tr>
 
-                                <!-- ✅ RÉDUCTION -->
-                                {% if cart.discount_amount > 0 %}
-                                <tr class="table-success">
-                                    <td colspan="3" class="text-end">
-                                        <strong>Réduction ({{ cart.coupon_code }}) :</strong>
-                                    </td>
-                                    <td><strong>-{{ cart.discount_amount }} €</strong></td>
-                                </tr>
-                                {% endif %}
-
-                                <!-- ✅ FRAIS DE LIVRAISON -->
-                                <tr>
-                                    <td colspan="3" class="text-end"><strong>Livraison :</strong></td>
-                                    <td>
-                                        <strong>
-                                            {% if cart.coupon_type == 'free_shipping' %}
-                                            <span class="text-success">Gratuite</span>
-                                            {% else %}
-                                            {% if cart.shipping_cost > 0 %}
-                                            {{ cart.shipping_cost }} €
-                                            {% else %}
-                                            <span class="text-success">Gratuite</span>
-                                            {% endif %}
-                                            {% endif %}
-                                        </strong>
-                                    </td>
-                                </tr>
-
-                                <!-- ✅ TOTAL FINAL -->
-                                <tr class="table-primary">
-                                    <td colspan="3" class="text-end"><strong>Total :</strong></td>
-                                    <td><strong>{{ cart.final_total }} €</strong></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+            <!-- Code promo appliqué -->
+            {% if cart.coupon_code %}
+            <div class="coupon-info mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-tag me-2"></i>
+                        <strong>Code promo appliqué : {{ cart.coupon_code }}</strong>
+                        {% if cart.coupon_type == 'free_shipping' %}
+                        <div class="mt-1">Livraison gratuite !</div>
+                        {% elif cart.discount_amount > 0 %}
+                        <div class="mt-1">Économie de {{ cart.discount_amount }}€ !</div>
+                        {% endif %}
                     </div>
-                </div>
-
-                <!-- ✅ SECTION CODE PROMO CORRIGÉE -->
-                {% if cart.coupon_code %}
-                <div class="alert alert-success mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-tag"></i>
-                            <strong>Code promo appliqué : {{ cart.coupon_code }}</strong>
-                            {% if cart.coupon_type == 'free_shipping' %}
-                            <br><span>🎉 Livraison gratuite !</span>
-                            {% elif cart.discount_amount > 0 %}
-                            <br><span>🎉 Économie de {{ cart.discount_amount }} € !</span>
-                            {% endif %}
-                        </div>
-                        <!-- ✅ CORRECTION : Remplacer le lien par un formulaire -->
-                        <form action="{% url 'shop:remove_coupon' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-times"></i> Changer
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Formulaire de commande -->
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <h5 class="mb-3">Informations de livraison</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                                <div class="text-danger small">{{ form.first_name.errors }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                                <div class="text-danger small">{{ form.last_name.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger small">{{ form.email.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.address.id_for_label }}" class="form-label">Adresse</label>
-                            {{ form.address }}
-                            {% if form.address.errors %}
-                                <div class="text-danger small">{{ form.address.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="{{ form.postal_code.id_for_label }}" class="form-label">Code postal</label>
-                                {{ form.postal_code }}
-                                {% if form.postal_code.errors %}
-                                    <div class="text-danger small">{{ form.postal_code.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-8 mb-3">
-                                <label for="{{ form.city.id_for_label }}" class="form-label">Ville</label>
-                                {{ form.city }}
-                                {% if form.city.errors %}
-                                    <div class="text-danger small">{{ form.city.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-credit-card"></i> Confirmer la commande
-                            </button>
-                            <a href="{% url 'shop:cart_detail' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Retour au panier
-                            </a>
-                        </div>
+                    <form action="{% url 'shop:remove_coupon' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-times"></i> Changer
+                        </button>
                     </form>
                 </div>
             </div>
+            {% endif %}
+
+            <!-- Formulaire de commande -->
+            <form method="post" class="form-section">
+                {% csrf_token %}
+                
+                <h5 class="section-title">Informations de livraison</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold">Prénom</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold">Nom</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.address.id_for_label }}" class="form-label fw-bold">Adresse</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="text-danger small mt-1">{{ form.address.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.postal_code.id_for_label }}" class="form-label fw-bold">Code postal</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="text-danger small mt-1">{{ form.postal_code.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label for="{{ form.city.id_for_label }}" class="form-label fw-bold">Ville</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="text-danger small mt-1">{{ form.city.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-credit-card"></i> Confirmer la commande
+                    </button>
+                    <a href="{% url 'shop:cart_detail' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour au panier
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}
