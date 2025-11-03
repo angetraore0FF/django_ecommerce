@@ -75,6 +75,11 @@ class UserProfileAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at', 'confirmation_token']
     date_hierarchy = 'created_at'
     
+    def is_vendor(self, obj):
+        return obj.is_vendor()
+    is_vendor.boolean = True
+    is_vendor.short_description = 'Est vendeur'
+    
     actions = ['confirm_emails', 'resend_confirmation_email']
 
     def get_full_name(self, obj):

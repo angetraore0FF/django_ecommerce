@@ -27,10 +27,14 @@ def product_list(request, category_slug=None):
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     
-    return render(request, 'shop/product/list.html', {
+    # Produits phares (ex: les 4 derniers produits)
+    featured_products = products.order_by('-created')[:4]
+    
+    return render(request, 'shop/product/list_apple.html', {
         'category': category,
         'categories': categories,
-        'products': products
+        'products': products,
+        'featured_products': featured_products
     })
 
 def product_detail(request, id, slug):

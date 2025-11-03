@@ -1,0 +1,140 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Ajouter un Produit - Vendeur{% endblock %}
+{% block page_title %}Ajouter un Produit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Nouveau Produit</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom du produit *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Catégorie *</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug *</label>
+                            {{ form.slug }}
+                            <small class="form-text text-muted">
+                                Identifiant unique pour l'URL (lettres, chiffres, traits d'union)
+                            </small>
+                            {% if form.slug.errors %}
+                                <div class="text-danger small">{{ form.slug.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.price.id_for_label }}" class="form-label">Prix *</label>
+                            <div class="input-group">
+                                {{ form.price }}
+                                <span class="input-group-text">€</span>
+                            </div>
+                            {% if form.price.errors %}
+                                <div class="text-danger small">{{ form.price.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock *</label>
+                            {{ form.stock }}
+                            {% if form.stock.errors %}
+                                <div class="text-danger small">{{ form.stock.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="text-danger small">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.available }}
+                            <label class="form-check-label" for="{{ form.available.id_for_label }}">
+                                Produit disponible à la vente
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'shop:vendor_products' %}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer le produit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Conseils pour un bon produit</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>Utilisez un nom clair et descriptif</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Choisissez une image de qualité</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Décrivez précisément les caractéristiques</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Fixez un prix compétitif</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Maintenez le stock à jour</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Génération automatique du slug à partir du nom
+document.getElementById('id_name').addEventListener('input', function() {
+    const slugField = document.getElementById('id_slug');
+    if (!slugField.value) {
+        const slug = this.value
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+        slugField.value = slug;
+    }
+});
+</script>
+{% endblock %}

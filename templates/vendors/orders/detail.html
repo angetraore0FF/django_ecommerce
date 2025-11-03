@@ -1,0 +1,188 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Commande #{{ order.id }} - Vendeur{% endblock %}
+{% block page_title %}Détail de la Commande #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la commande</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Client</h6>
+                        <p>
+                            <strong>{{ order.first_name }} {{ order.last_name }}</strong><br>
+                            {{ order.email }}<br>
+                            {{ order.phone_number|default:"Non renseigné" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Livraison</h6>
+                        <p>
+                            {{ order.address }}<br>
+                            {{ order.postal_code }} {{ order.city }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>Détails de la commande</h6>
+                        <p>
+                            <strong>Date :</strong> {{ order.created|date:"d/m/Y à H:i" }}<br>
+                            <strong>Statut :</strong> 
+                            <span class="badge bg-{{ order.get_status_display_class }}">
+                                {{ order.get_status_display }}
+                            </span><br>
+                            <strong>Paiement :</strong> 
+                            <span class="badge {% if order.paid %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ order.paid|yesno:"Payé,En attente" }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Montants</h6>
+                        <p>
+                            <strong>Sous-total :</strong> {{ order.get_total_before_discount }} €<br>
+                            {% if order.discount_amount > 0 %}
+                            <strong>Réduction :</strong> -{{ order.discount_amount }} €<br>
+                            {% endif %}
+                            <strong>Livraison :</strong> {{ order.shipping_cost }} €<br>
+                            <strong class="text-primary">Total : {{ order.get_total_cost }} €</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Produits de la commande (pour ce vendeur) -->
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-box me-2"></i>Produits de cette commande</h5>
+            </div>
+            <div class="card-body">
+                {% if order_items %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produit</th>
+                                <th>Prix unitaire</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                             class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ item.product.name }}</strong><br>
+                                            <small class="text-muted">Catégorie : {{ item.product.category.name }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.price }} €</td>
+                                <td>{{ item.quantity }}</td>
+                                <td><strong>{{ item.get_cost }} €</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total pour vos produits :</strong></td>
+                                <td><strong class="text-primary">
+                                    {% with total=0 %}
+                                        {% for item in order_items %}
+                                            {% widthratio item.get_cost 1 1 as item_total %}
+                                            {{ item_total|add:total }}
+                                        {% endfor %}
+                                    {% endwith %} €
+                                </strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Aucun produit de votre boutique dans cette commande.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Mise à jour du statut -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Mettre à jour le statut</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Nouveau statut</label>
+                        <select name="status" id="status" class="form-select">
+                            {% for status_value, status_label in order.STATUS_CHOICES %}
+                            <option value="{{ status_value }}" 
+                                    {% if order.status == status_value %}selected{% endif %}>
+                                {{ status_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="fas fa-sync me-2"></i>Mettre à jour
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Actions rapides -->
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="mailto:{{ order.email }}" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Contacter le client
+                    </a>
+                    <a href="{% url 'shop:vendor_orders' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux commandes
+                    </a>
+                    {% if order.can_be_cancelled %}
+                    <button class="btn btn-outline-danger">
+                        <i class="fas fa-times me-2"></i>Annuler la commande
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informations complémentaires -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-history me-2"></i>Historique</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <strong>Créée le :</strong> {{ order.created|date:"d/m/Y à H:i" }}<br>
+                    <strong>Dernière modification :</strong> {{ order.updated|date:"d/m/Y à H:i" }}<br>
+                    {% if order.coupon %}
+                    <strong>Code promo utilisé :</strong> {{ order.coupon.code }}<br>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

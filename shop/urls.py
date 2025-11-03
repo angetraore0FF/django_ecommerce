@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import vendors
 
 app_name = 'shop'
 
@@ -40,4 +41,14 @@ urlpatterns = [
     path('confirm-email/<uuid:token>/', views.confirm_email_view, name='confirm_email'),
     path('admin/confirm-email/<int:user_id>/', views.admin_confirm_email, name='admin_confirm_email'),
     path('resend-confirmation/', views.resend_confirmation_email, name='resend_confirmation'),
+
+     # ✅ ESPACE VENDEUR
+    path('vendor/dashboard/', vendors.vendor_dashboard, name='vendor_dashboard'),
+    path('vendor/products/', vendors.vendor_products, name='vendor_products'),
+    path('vendor/products/add/', vendors.vendor_add_product, name='vendor_add_product'),
+    path('vendor/products/edit/<int:product_id>/', vendors.vendor_edit_product, name='vendor_edit_product'),
+    path('vendor/orders/', vendors.vendor_orders, name='vendor_orders'),
+    path('vendor/orders/<int:order_id>/', vendors.vendor_order_detail, name='vendor_order_detail'),
+    path('vendor/earnings/', vendors.vendor_earnings, name='vendor_earnings'),
+    path('vendor/api/sales-statistics/', vendors.vendor_sales_statistics_api, name='vendor_sales_statistics_api'),
 ]
