@@ -1,0 +1,110 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Mes Produits - Vendeur{% endblock %}
+{% block page_title %}Mes Produits{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0">Gestion des produits</h5>
+    <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Ajouter un produit
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                 class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ product.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ product.slug }}</small>
+                        </td>
+                        <td>{{ product.category.name }}</td>
+                        <td>
+                            <strong class="text-primary">{{ product.price }} €</strong>
+                        </td>
+                        <td>
+                            <span class="badge {% if product.stock > 10 %}bg-success{% elif product.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if product.available %}
+                            <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                            <span class="badge bg-danger">Indisponible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'shop:product_detail' product.id product.slug %}" 
+                                   class="btn btn-outline-primary" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'shop:vendor_edit_product' product.id %}" 
+                                   class="btn btn-outline-warning" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-danger" title="Supprimer"
+                                   onclick="confirmDelete('{{ product.id }}', '{{ product.name }}')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Aucun produit</h5>
+            <p class="text-muted">Commencez par ajouter votre premier produit</p>
+            <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Ajouter un produit
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(productId, productName) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer le produit "${productName}" ?`)) {
+        // Ici vous pouvez ajouter la logique de suppression via AJAX
+        // Pour l'instant, on redirige vers une vue de suppression
+        window.location.href = `/vendor/products/delete/${productId}/`;
+    }
+}
+</script>
+{% endblock %}

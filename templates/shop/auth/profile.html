@@ -26,6 +26,48 @@
             </div>
         </div>
         
+        <!-- ✅ SECTION VENDEUR -->
+        {% if user.profile.wants_to_be_vendor and not user.profile.is_vendor %}
+        <!-- ✅ UTILISATEUR QUI SOUHAITE DEVENIR VENDEUR MAIS N'A PAS ENCORE DE PRODUITS -->
+        <div class="card mt-3 border-warning">
+            <div class="card-body">
+                <h6>🚀 Devenir Vendeur</h6>
+                <p class="small text-muted">Vous avez exprimé votre intérêt pour devenir vendeur.</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'shop:vendor_dashboard' %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-store"></i> Commencer à vendre
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% elif user.profile.is_vendor %}
+        <!-- ✅ UTILISATEUR QUI EST DÉJÀ VENDEUR -->
+        <div class="card mt-3 border-success">
+            <div class="card-body">
+                <h6>✅ Vous êtes Vendeur</h6>
+                <p class="small text-muted">Vous avez {{ user.vendor_products.count }} produit(s) en vente.</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'shop:vendor_dashboard' %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-store"></i> Espace Vendeur
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- ✅ UTILISATEUR STANDARD -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>💼 Devenir Vendeur</h6>
+                <p class="small text-muted">Vendez vos produits sur KaderShop.</p>
+                <div class="d-grid gap-2">
+                    <a href=# class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-info-circle"></i> En savoir plus
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- ✅ LIENS RAPIDES -->
         <div class="card mt-3">
             <div class="card-body">

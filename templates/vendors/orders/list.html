@@ -1,0 +1,211 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Commandes - Vendeur{% endblock %}
+{% block page_title %}Gestion des Commandes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0">Commandes des clients</h5>
+    
+    <div class="btn-group">
+        <a href="{% url 'shop:vendor_orders' %}" 
+           class="btn btn-outline-primary {% if status_filter == 'all' %}active{% endif %}">
+            Toutes
+        </a>
+        <a href="{% url 'shop:vendor_orders' %}?status=pending" 
+           class="btn btn-outline-warning {% if status_filter == 'pending' %}active{% endif %}">
+            En attente
+        </a>
+        <a href="{% url 'shop:vendor_orders' %}?status=processing" 
+           class="btn btn-outline-info {% if status_filter == 'processing' %}active{% endif %}">
+            En traitement
+        </a>
+        <a href="{% url 'shop:vendor_orders' %}?status=shipped" 
+           class="btn btn-outline-primary {% if status_filter == 'shipped' %}active{% endif %}">
+            Expédiées
+        </a>
+        <a href="{% url 'shop:vendor_orders' %}?status=delivered" 
+           class="btn btn-outline-success {% if status_filter == 'delivered' %}active{% endif %}">
+            Livrées
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        {% if order_items %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Commande</th>
+                        <th>Client</th>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>
+                            <strong>#{{ item.order.id }}</strong>
+                        </td>
+                        <td>
+                            {{ item.order.first_name }} {{ item.order.last_name }}
+                            <br>
+                            <small class="text-muted">{{ item.order.email }}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                     class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.product.name }}</strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }} €</td>
+                        <td>
+                            <strong class="text-primary">{{ item.get_cost }} €</strong>
+                        </td>
+                        <td>
+                            {{ item.order.created|date:"d/m/Y" }}
+                            <br>
+                            <small class="text-muted">{{ item.order.created|date:"H:i" }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ item.order.get_status_display_class }}">
+                                {{ item.order.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'shop:vendor_order_detail' item.order.id %}" 
+                               class="btn btn-sm btn-outline-primary" title="Détails">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Aucune commande</h5>
+            <p class="text-muted">
+                {% if status_filter != 'all' %}
+                Aucune commande avec le statut "{{ status_filter }}"
+                {% else %}
+                Aucune commande pour le moment
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Statistiques des commandes -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Commandes totales
+                        </div>
+                        <div class="h5 mb-0">{{ order_items|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Chiffre d'affaires
+                        </div>
+                        <div class="h5 mb-0">
+                            {% with total=0 %}
+                                {% for item in order_items %}
+                                    {% widthratio item.get_cost 1 1 as item_total %}
+                                    {{ item_total|add:total }}
+                                {% endfor %}
+                            {% endwith %} €
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-euro-sign fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white shadow">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            En attente
+                        </div>
+                        <div class="h5 mb-0">
+                            {% with pending=0 %}
+                                {% for item in order_items %}
+                                    {% if item.order.status == 'pending' %}
+                                        {{ pending|add:1 }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">
+                            Produits vendus
+                        </div>
+                        <div class="h5 mb-0">
+                            {% with total_quantity=0 %}
+                                {% for item in order_items %}
+                                    {{ item.quantity|add:total_quantity }}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-box fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
