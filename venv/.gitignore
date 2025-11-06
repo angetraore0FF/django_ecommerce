@@ -1,0 +1,14 @@
+# Database
+*.sqlite3
+*.db
+db.sqlite3
+
+# Environnements virtuels
+venv/
+env/
+
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
