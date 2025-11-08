@@ -1,0 +1,229 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Revenus - Vendeur{% endblock %}
+{% block page_title %}Mes Revenus{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 style="font-size: 24px; font-weight: 600; margin: 0;">Historique des revenus</h5>
+    
+    <div class="btn-group">
+        <a href="{% url 'shop:vendor_earnings' %}?period=week" 
+           class="btn btn-sm {% if period == 'week' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            7 jours
+        </a>
+        <a href="{% url 'shop:vendor_earnings' %}?period=month" 
+           class="btn btn-sm {% if period == 'month' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            30 jours
+        </a>
+        <a href="{% url 'shop:vendor_earnings' %}?period=year" 
+           class="btn btn-sm {% if period == 'year' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            1 an
+        </a>
+    </div>
+</div>
+
+<!-- Cartes de résumé -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Chiffre d'affaires total</div>
+                <div class="stat-value">{{ total_earned }} €</div>
+                <small style="color: #86868b; margin-top: 8px; display: block;">Sur la période sélectionnée</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ earnings|length }}</div>
+                <small style="color: #86868b; margin-top: 8px; display: block;">Commandes payées</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list me-2"></i>Détail des revenus</h5>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if earnings %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Commande</th>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Total</th>
+                        <th>Client</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in earnings %}
+                    <tr>
+                        <td>
+                            <div>{{ item.order.created|date:"d/m/Y" }}</div>
+                            <small style="color: #86868b;">{{ item.order.created|date:"H:i" }}</small>
+                        </td>
+                        <td>
+                            <strong>#{{ item.order.id }}</strong>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                     style="width: 48px; height: 48px; object-fit: cover; border-radius: 10px; margin-right: 12px;">
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.product.name }}</strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }} €</td>
+                        <td>
+                            <strong>{{ item.get_cost }} €</strong>
+                        </td>
+                        <td>
+                            <div style="font-weight: 500;">{{ item.order.first_name }} {{ item.order.last_name }}</div>
+                            <small style="color: #86868b;">{{ item.order.email }}</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot style="border-top: 2px solid #d2d2d7;">
+                    <tr>
+                        <td colspan="5" style="text-align: right; padding: 20px 12px;"><strong>Total :</strong></td>
+                        <td style="padding: 20px 12px;"><strong style="font-size: 18px;">{{ total_earned }} €</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 80px 24px;">
+            <i class="fas fa-chart-line fa-4x mb-4" style="color: #d2d2d7;"></i>
+            <h5 style="color: #1d1d1f; margin-bottom: 12px;">Aucun revenu</h5>
+            <p style="color: #86868b;">
+                {% if period == 'week' %}
+                Aucune vente cette semaine
+                {% elif period == 'month' %}
+                Aucune vente ce mois-ci
+                {% elif period == 'year' %}
+                Aucune vente cette année
+                {% else %}
+                Aucune vente pour le moment
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Graphique des revenus -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-chart-bar me-2"></i>Évolution des revenus</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="earningsChart" style="max-height: 300px;"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Graphique des revenus avec style minimaliste
+const ctx = document.getElementById('earningsChart').getContext('2d');
+const earningsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+        datasets: [{
+            label: 'Revenus (€)',
+            data: [1200, 1900, 1500, 2000, 1800, 2200, 2400, 2100, 2300, 2500, 2700, 3000],
+            backgroundColor: '#1d1d1f',
+            borderColor: '#1d1d1f',
+            borderWidth: 0,
+            borderRadius: 8,
+            barThickness: 32
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: '#1d1d1f',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: {
+                    size: 14,
+                    weight: '600',
+                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                },
+                bodyFont: {
+                    size: 13,
+                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                },
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        return context.parsed.y + ' €';
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                border: {
+                    display: false
+                },
+                ticks: {
+                    color: '#86868b',
+                    font: {
+                        size: 13,
+                        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                    }
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#f5f5f7',
+                    drawBorder: false
+                },
+                border: {
+                    display: false
+                },
+                ticks: {
+                    color: '#86868b',
+                    font: {
+                        size: 13,
+                        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                    },
+                    callback: function(value) {
+                        return value + ' €';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

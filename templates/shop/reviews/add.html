@@ -3,82 +3,253 @@
 {% block title %}Laisser un avis - {{ product.name }} - KaderShop{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="mb-0">
-                    <i class="fas fa-star text-warning"></i>
-                    {% if review %}Modifier votre avis{% else %}Laisser un avis{% endif %}
-                </h2>
-                <p class="mb-0 text-muted">Sur {{ product.name }}</p>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-3">
+<style>
+    .review-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .review-card {
+        border: 2px solid var(--black);
+    }
+    
+    .review-card-header {
+        background: var(--black);
+        color: var(--white);
+        padding: 1.5rem;
+    }
+    
+    .review-card-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .product-preview {
+        border: 2px solid var(--black);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        background: var(--gray-light);
+    }
+    
+    .product-thumbnail {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: 2px solid var(--black);
+    }
+    
+    .product-thumbnail-placeholder {
+        width: 100px;
+        height: 100px;
+        background-color: var(--white);
+        border: 2px solid var(--black);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .rating-section {
+        padding: 1.5rem;
+        border: 2px solid var(--black);
+        background: var(--gray-light);
+        margin-bottom: 1.5rem;
+    }
+    
+    .rating-stars {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .rating-stars input[type="radio"] {
+        display: none;
+    }
+    
+    .rating-stars label {
+        font-size: 2.5rem;
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s;
+        line-height: 1;
+    }
+    
+    .rating-stars input[type="radio"]:checked ~ label,
+    .rating-stars label:hover,
+    .rating-stars label:hover ~ label {
+        color: var(--black);
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid var(--black);
+        border-radius: 0;
+        padding: 0.75rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--black);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    textarea.form-control {
+        min-height: 150px;
+    }
+    
+    .info-box {
+        border: 2px solid var(--black);
+        padding: 1rem;
+        background: var(--white);
+    }
+</style>
+
+<div class="review-container">
+    <div class="review-card card">
+        <div class="review-card-header">
+            <h2>
+                <i class="fas fa-star me-2"></i>
+                {% if review %}Modifier votre avis{% else %}Laisser un avis{% endif %}
+            </h2>
+            <p class="mb-0">Sur {{ product.name }}</p>
+        </div>
+        <div class="card-body p-4">
+            <!-- Aperçu du produit -->
+            <div class="product-preview">
+                <div class="row align-items-center">
+                    <div class="col-auto">
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                        <img src="{{ product.image.url }}" class="product-thumbnail" alt="{{ product.name }}">
                         {% else %}
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 100px;">
+                        <div class="product-thumbnail-placeholder">
                             <i class="fas fa-image fa-2x text-muted"></i>
                         </div>
                         {% endif %}
                     </div>
-                    <div class="col-md-9">
-                        <h5>{{ product.name }}</h5>
+                    <div class="col">
+                        <h5 class="mb-2">{{ product.name }}</h5>
                         <p class="text-muted mb-0">{{ product.description|truncatewords:20 }}</p>
                     </div>
                 </div>
-
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label class="form-label"><strong>Note *</strong></label>
-                        <div>
-                            {{ form.rating }}
-                        </div>
-                        {% if form.rating.errors %}
-                            <div class="text-danger small">{{ form.rating.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.title.id_for_label }}" class="form-label"><strong>Titre *</strong></label>
-                        {{ form.title }}
-                        {% if form.title.errors %}
-                            <div class="text-danger small">{{ form.title.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="{{ form.comment.id_for_label }}" class="form-label"><strong>Commentaire *</strong></label>
-                        {{ form.comment }}
-                        {% if form.comment.errors %}
-                            <div class="text-danger small">{{ form.comment.errors }}</div>
-                        {% endif %}
-                        <div class="form-text">
-                            Décrivez votre expérience avec ce produit. Votre avis aidera d'autres clients à faire leur choix.
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        Votre avis sera soumis à modération avant publication.
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'shop:product_detail' product.id product.slug %}" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Retour
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                            {% if review %}Modifier l'avis{% else %}Publier l'avis{% endif %}
-                        </button>
-                    </div>
-                </form>
             </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Note -->
+                <div class="rating-section">
+                    <label class="form-label text-center d-block mb-3">
+                        <strong>Note *</strong>
+                    </label>
+                    <div class="rating-stars">
+                        <input type="radio" name="rating" value="5" id="star5" {% if form.rating.value == '5' %}checked{% endif %}>
+                        <label for="star5">★</label>
+                        <input type="radio" name="rating" value="4" id="star4" {% if form.rating.value == '4' %}checked{% endif %}>
+                        <label for="star4">★</label>
+                        <input type="radio" name="rating" value="3" id="star3" {% if form.rating.value == '3' %}checked{% endif %}>
+                        <label for="star3">★</label>
+                        <input type="radio" name="rating" value="2" id="star2" {% if form.rating.value == '2' %}checked{% endif %}>
+                        <label for="star2">★</label>
+                        <input type="radio" name="rating" value="1" id="star1" {% if form.rating.value == '1' %}checked{% endif %}>
+                        <label for="star1">★</label>
+                    </div>
+                    {% if form.rating.errors %}
+                        <div class="text-danger small text-center mt-2">{{ form.rating.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Titre -->
+                <div class="form-section">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Titre *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Commentaire -->
+                <div class="form-section">
+                    <label for="{{ form.comment.id_for_label }}" class="form-label">Commentaire *</label>
+                    {{ form.comment }}
+                    {% if form.comment.errors %}
+                        <div class="text-danger small mt-1">{{ form.comment.errors }}</div>
+                    {% endif %}
+                    <div class="form-text mt-2">
+                        Décrivez votre expérience avec ce produit. Votre avis aidera d'autres clients à faire leur choix.
+                    </div>
+                </div>
+                
+                <!-- Information de modération -->
+                <div class="info-box mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Votre avis sera soumis à modération avant publication.
+                </div>
+                
+                <!-- Boutons -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        {% if review %}Modifier l'avis{% else %}Publier l'avis{% endif %}
+                    </button>
+                    <a href="{% url 'shop:product_detail' product.id product.slug %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+// Amélioration de l'expérience utilisateur pour les étoiles
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.rating-stars label');
+    
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const value = this.previousElementSibling.value;
+            highlightStars(value);
+        });
+    });
+    
+    document.querySelector('.rating-section').addEventListener('mouseleave', function() {
+        const checked = document.querySelector('.rating-stars input:checked');
+        if (checked) {
+            highlightStars(checked.value);
+        } else {
+            clearHighlight();
+        }
+    });
+    
+    function highlightStars(value) {
+        stars.forEach((star, index) => {
+            if (stars.length - index <= value) {
+                star.style.color = 'var(--black)';
+            } else {
+                star.style.color = '#ddd';
+            }
+        });
+    }
+    
+    function clearHighlight() {
+        stars.forEach(star => {
+            star.style.color = '#ddd';
+        });
+    }
+    
+    // Initialiser l'affichage si une note est déjà sélectionnée
+    const checked = document.querySelector('.rating-stars input:checked');
+    if (checked) {
+        highlightStars(checked.value);
+    }
+});
+</script>
 {% endblock %}

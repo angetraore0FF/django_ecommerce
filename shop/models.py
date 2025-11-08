@@ -28,6 +28,15 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    vendor = models.ForeignKey(
+        'auth.User', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True,
+        related_name='vendor_products',
+        verbose_name="Vendeur"
+    )
     
     class Meta:
         ordering = ['-created']
@@ -387,11 +396,18 @@ class OrderItem(models.Model):
     def get_cost(self):
         return self.price * self.quantity
 
+# Dans models.py - Modifiez la classe UserProfile
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     birth_date = models.DateField()
     phone_number = models.CharField(max_length=15)
     email_confirmed = models.BooleanField(default=False)
+    # ✅ NOUVEAU CHAMP : Souhaite devenir vendeur
+    wants_to_be_vendor = models.BooleanField(
+        default=False,
+        verbose_name="Souhaite devenir vendeur"
+    )
     confirmation_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -413,11 +429,14 @@ class UserProfile(models.Model):
         return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
     
     def generate_new_confirmation_token(self):
-        """Génère un nouveau token de confirmation"""
-        import uuid
         self.confirmation_token = uuid.uuid4()
         self.save()
         return self.confirmation_token
+    
+    # ✅ NOUVELLE MÉTHODE : Vérifier si l'utilisateur est vendeur
+    def is_vendor(self):
+        """Vérifie si l'utilisateur est vendeur (a au moins un produit)"""
+        return self.user.vendor_products.exists()
 
 class Favorite(models.Model):
     """Modèle pour les produits favoris des utilisateurs"""

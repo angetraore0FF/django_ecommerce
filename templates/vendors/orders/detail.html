@@ -1,0 +1,195 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Commande #{{ order.id }} - Vendeur{% endblock %}
+{% block page_title %}Détail de la Commande #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Informations de la commande</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6" style="padding-bottom: 24px; border-bottom: 1px solid #d2d2d7;">
+                        <h6 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Client</h6>
+                        <p style="margin: 0; line-height: 1.6;">
+                            <strong>{{ order.first_name }} {{ order.last_name }}</strong><br>
+                            <span style="color: #86868b;">{{ order.email }}</span><br>
+                            <span style="color: #86868b;">{{ order.phone_number|default:"Non renseigné" }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6" style="padding-bottom: 24px; border-bottom: 1px solid #d2d2d7;">
+                        <h6 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Livraison</h6>
+                        <p style="margin: 0; line-height: 1.6; color: #86868b;">
+                            {{ order.address }}<br>
+                            {{ order.postal_code }} {{ order.city }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-top: 24px;">
+                    <div class="col-md-6">
+                        <h6 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Détails</h6>
+                        <p style="margin: 0; line-height: 1.8;">
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Date :</strong>
+                            {{ order.created|date:"d/m/Y à H:i" }}<br>
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Statut :</strong>
+                            <span class="badge bg-{{ order.get_status_display_class }}">
+                                {{ order.get_status_display }}
+                            </span><br>
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Paiement :</strong>
+                            <span class="badge {% if order.paid %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ order.paid|yesno:"Payé,En attente" }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Montants</h6>
+                        <p style="margin: 0; line-height: 1.8;">
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Sous-total :</strong>
+                            {{ order.get_total_before_discount }} €<br>
+                            {% if order.discount_amount > 0 %}
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Réduction :</strong>
+                            -{{ order.discount_amount }} €<br>
+                            {% endif %}
+                            <strong style="color: #86868b; display: inline-block; width: 120px;">Livraison :</strong>
+                            {{ order.shipping_cost }} €<br>
+                            <strong style="display: inline-block; width: 120px;">Total :</strong>
+                            <strong>{{ order.get_total_cost }} €</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Produits de la commande -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-box me-2"></i>Produits de cette commande</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                {% if order_items %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Prix unitaire</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center;">
+                                        {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                             style="width: 56px; height: 56px; object-fit: cover; border-radius: 12px; margin-right: 16px;">
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ item.product.name }}</strong><br>
+                                            <small style="color: #86868b;">{{ item.product.category.name }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.price }} €</td>
+                                <td>{{ item.quantity }}</td>
+                                <td><strong>{{ item.get_cost }} €</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot style="border-top: 2px solid #d2d2d7;">
+                            <tr>
+                                <td colspan="3" style="text-align: right; padding: 20px 12px;"><strong>Total pour vos produits :</strong></td>
+                                <td style="padding: 20px 12px;"><strong style="font-size: 18px;">
+                                    {% with total=0 %}
+                                        {% for item in order_items %}
+                                            {% widthratio item.get_cost 1 1 as item_total %}
+                                            {{ item_total|add:total }}
+                                        {% endfor %}
+                                    {% endwith %} €
+                                </strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center" style="padding: 40px 24px;">
+                    <p style="color: #86868b; margin: 0;">Aucun produit de votre boutique dans cette commande.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Mise à jour du statut -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit me-2"></i>Mettre à jour</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Nouveau statut</label>
+                        <select name="status" id="status" class="form-select">
+                            {% for status_value, status_label in order.STATUS_CHOICES %}
+                            <option value="{{ status_value }}" 
+                                    {% if order.status == status_value %}selected{% endif %}>
+                                {{ status_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sync me-2"></i>Mettre à jour
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Actions rapides -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="mailto:{{ order.email }}" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Contacter le client
+                    </a>
+                    <a href="{% url 'shop:vendor_orders' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux commandes
+                    </a>
+                    {% if order.can_be_cancelled %}
+                    <button class="btn btn-outline-primary" style="border-color: #ff3b30; color: #ff3b30;">
+                        <i class="fas fa-times me-2"></i>Annuler la commande
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historique -->
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-history me-2"></i>Historique</h6>
+            </div>
+            <div class="card-body">
+                <small style="color: #86868b; line-height: 1.8; display: block;">
+                    <strong style="color: #1d1d1f;">Créée le :</strong> {{ order.created|date:"d/m/Y à H:i" }}<br>
+                    <strong style="color: #1d1d1f;">Dernière modification :</strong> {{ order.updated|date:"d/m/Y à H:i" }}<br>
+                    {% if order.coupon %}
+                    <strong style="color: #1d1d1f;">Code promo :</strong> {{ order.coupon.code }}<br>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

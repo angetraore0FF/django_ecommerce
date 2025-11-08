@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Order
+from .models import Order, Product
 from django.core.exceptions import ValidationError
 import re
 from .models import Order, ProductReview # Assurez-vous que ProductReview est bien importé
@@ -67,6 +67,8 @@ class OrderCreateForm(forms.ModelForm):
             'city': 'Ville',
         }
 
+# Dans forms.py - Modifiez la classe CustomUserCreationForm
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -107,10 +109,19 @@ class CustomUserCreationForm(UserCreationForm):
             'placeholder': '+33 6 12 34 56 78'
         })
     )
+    # ✅ NOUVEAU CHAMP : Devenir vendeur
+    become_vendor = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+        }),
+        label="Devenir vendeur sur KaderShop"
+    )
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'birth_date', 'phone_number', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'email', 'birth_date', 'phone_number', 'password1', 'password2', 'become_vendor']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -120,27 +131,29 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
-        # Validation basique du numéro de téléphone
         if not re.match(r'^[\+]?[0-9\s\-\(\)]{10,15}$', phone_number):
             raise ValidationError("Veuillez entrer un numéro de téléphone valide.")
         return phone_number
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.username = self.cleaned_data['email']  # Utiliser l'email comme username
+        user.username = self.cleaned_data['email']
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
     
         if commit:
             user.save()
-        # Créer le profil utilisateur avec TOUTES les données
+        
+        # Créer le profil utilisateur
         from .models import UserProfile
         UserProfile.objects.create(
             user=user,
             birth_date=self.cleaned_data['birth_date'],
             phone_number=self.cleaned_data['phone_number'],
-            email_confirmed=False
+            email_confirmed=False,
+            # ✅ ENREGISTRER LE CHOIX "DEVENIR VENDEUR"
+            wants_to_be_vendor=self.cleaned_data['become_vendor']
         )
         return user
 
@@ -277,3 +290,60 @@ class CouponApplyForm(forms.Form):
         """Normalise le code promo en majuscules et sans espaces inutiles"""
         code = self.cleaned_data.get('code').upper().strip()
         return code
+    
+# ✅ AJOUTEZ CE FORMULAIRE À LA FIN DE shop/forms.py
+
+class ProductForm(forms.ModelForm):
+    """Formulaire pour la gestion des produits par les vendeurs"""
+    
+    class Meta:
+        model = Product
+        fields = ['category', 'name', 'slug', 'description', 'price', 'image', 'stock', 'available']
+        widgets = {
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom du produit'
+            }),
+            'slug': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'slug-automatique-ou-personnalise'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Description détaillée du produit...',
+                'rows': 4
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Quantité en stock'
+            }),
+            'available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': 'Nom du produit',
+            'slug': 'Slug (URL)',
+            'description': 'Description',
+            'price': 'Prix (€)',
+            'image': 'Image du produit',
+            'stock': 'Stock disponible',
+            'available': 'Produit disponible',
+        }
+    
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price and price <= 0:
+            raise ValidationError("Le prix doit être supérieur à 0.")
+        return price
+    
+    def clean_stock(self):
+        stock = self.cleaned_data.get('stock')
+        if stock and stock < 0:
+            raise ValidationError("Le stock ne peut pas être négatif.")
+        return stock

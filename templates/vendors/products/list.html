@@ -1,0 +1,106 @@
+{% extends 'vendors/base.html' %}
+
+{% block title %}Mes Produits - Vendeur{% endblock %}
+{% block page_title %}Mes Produits{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 style="font-size: 24px; font-weight: 600; margin: 0;">Gestion des produits</h5>
+    <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Ajouter un produit
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                 style="width: 56px; height: 56px; object-fit: cover; border-radius: 12px;">
+                            {% else %}
+                            <div style="width: 56px; height: 56px; background: #f5f5f7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image" style="color: #86868b;"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-weight: 500;">{{ product.name }}</div>
+                            <small style="color: #86868b;">{{ product.slug }}</small>
+                        </td>
+                        <td style="color: #86868b;">{{ product.category.name }}</td>
+                        <td>
+                            <strong>{{ product.price }} €</strong>
+                        </td>
+                        <td>
+                            <span class="badge {% if product.stock > 10 %}bg-success{% elif product.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if product.available %}
+                            <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                            <span class="badge bg-danger">Indisponible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'shop:product_detail' product.id product.slug %}" 
+                                   class="btn btn-outline-primary" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'shop:vendor_edit_product' product.id %}" 
+                                   class="btn btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary" title="Supprimer"
+                                   onclick="confirmDelete('{{ product.id }}', '{{ product.name }}'); return false;">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 80px 24px;">
+            <i class="fas fa-box fa-4x mb-4" style="color: #d2d2d7;"></i>
+            <h5 style="color: #1d1d1f; margin-bottom: 12px;">Aucun produit</h5>
+            <p style="color: #86868b; margin-bottom: 32px;">Commencez par ajouter votre premier produit</p>
+            <a href="{% url 'shop:vendor_add_product' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Ajouter un produit
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(productId, productName) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer le produit "${productName}" ?`)) {
+        window.location.href = `/vendor/products/delete/${productId}/`;
+    }
+}
+</script>
+{% endblock %}
