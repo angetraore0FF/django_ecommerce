@@ -1,3 +1,5 @@
+[file name]: detail.html
+[file content begin]
 {% extends "base.html" %}
 
 {% block title %}{{ product.name }} - KaderShop{% endblock %}
@@ -182,12 +184,13 @@
                 {% endif %}
                 
                 {% if user.is_authenticated %}
-                <a href="{% url 'shop:toggle_favorite' product.id %}" 
-                   class="favorite-btn" 
-                   data-product-id="{{ product.id }}"
-                   title="{% if is_favorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                    <i class="{% if is_favorite %}fas{% else %}far{% endif %} fa-heart fa-lg"></i>
-                </a>
+                <form action="{% url 'shop:toggle_favorite' product.id %}" method="post" class="d-inline">
+                    {% csrf_token %} <!-- ✅ AJOUT DU CSRF TOKEN -->
+                    <button type="submit" class="favorite-btn" 
+                            title="{% if is_favorite %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                        <i class="{% if is_favorite %}fas{% else %}far{% endif %} fa-heart fa-lg"></i>
+                    </button>
+                </form>
                 {% endif %}
             </div>
         </div>
@@ -227,7 +230,7 @@
             
             {% if product.stock > 0 %}
             <form action="{% url 'shop:cart_add' product.id %}" method="post">
-                {% csrf_token %}
+                {% csrf_token %} <!-- ✅ AJOUT DU CSRF TOKEN -->
                 <div class="quantity-control">
                     <label for="id_quantity" class="fw-bold">Quantité:</label>
                     <input type="number" 
@@ -289,10 +292,13 @@
                             <a href="{% url 'shop:add_review' product.id %}" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="fas fa-edit"></i> Modifier
                             </a>
-                            <a href="{% url 'shop:delete_review' user_review.id %}" class="btn btn-sm btn-outline-danger" 
-                               onclick="return confirm('Êtes-vous sûr ?')">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </a>
+                            <form action="{% url 'shop:delete_review' user_review.id %}" method="post" class="d-inline">
+                                {% csrf_token %} <!-- ✅ AJOUT DU CSRF TOKEN -->
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                       onclick="return confirm('Êtes-vous sûr ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -353,7 +359,7 @@
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <form method="post" action="{% url 'shop:report_review' review.id %}">
-                            {% csrf_token %}
+                            {% csrf_token %} <!-- ✅ CSRF TOKEN DÉJÀ PRÉSENT -->
                             <div class="modal-body">
                                 <p>Pourquoi signalez-vous cet avis ?</p>
                                 <select name="reason" class="form-select mb-3">
@@ -386,3 +392,4 @@
     </div>
 </div>
 {% endblock %}
+[file content end]
