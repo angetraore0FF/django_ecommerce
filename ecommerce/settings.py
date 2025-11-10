@@ -143,7 +143,7 @@ EMAIL_HOST = 'smtp.gmail.com'  # Ou votre serveur SMTP
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'anget373@gmail.com'  # Remplacez par votre email
-EMAIL_HOST_PASSWORD = 'eafz qcim pfyg wevg'  # Remplacez par votre mot de passe d'application
+EMAIL_HOST_PASSWORD = 'ghzq gyep xebw dodh'  # Remplacez par votre mot de passe d'application
 DEFAULT_FROM_EMAIL = 'anget373@gmail.com'
 
 # settings.py

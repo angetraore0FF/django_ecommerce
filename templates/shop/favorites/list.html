@@ -1,3 +1,5 @@
+[file name]: list.html
+[file content begin]
 {% extends "base.html" %}
 
 {% block title %}Mes Favoris - KaderShop{% endblock %}
@@ -144,11 +146,12 @@
                 <a href="{% url 'shop:product_detail' favorite.product.id favorite.product.slug %}" class="btn btn-outline-primary">
                     <i class="fas fa-eye"></i> Voir détails
                 </a>
-                <a href="{% url 'shop:toggle_favorite' favorite.product.id %}" 
-                   class="btn btn-outline-danger favorite-btn" 
-                   data-product-id="{{ favorite.product.id }}">
-                    <i class="fas fa-heart"></i> Retirer
-                </a>
+                <form action="{% url 'shop:toggle_favorite' favorite.product.id %}" method="post" class="d-inline">
+                    {% csrf_token %} <!-- ✅ AJOUT DU CSRF TOKEN -->
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="fas fa-heart"></i> Retirer
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -165,3 +168,4 @@
 </div>
 {% endif %}
 {% endblock %}
+[file content end]

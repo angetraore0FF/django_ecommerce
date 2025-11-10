@@ -547,19 +547,50 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            
-            # Envoyer l'email de confirmation
-            send_confirmation_email(user)
-            
-            messages.success(request, 
-                f'Compte créé avec succès pour {user.first_name} {user.last_name} ! '
-                f'Un email de confirmation a été envoyé à {user.email}. '
-                f'Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation.'
-            )
-            return redirect('shop:login')
+            try:
+                user = form.save()
+                
+                # ✅ CRÉATION AUTOMATIQUE DU PROFIL SI NÉCESSAIRE
+                if not hasattr(user, 'profile'):
+                    UserProfile.objects.create(
+                        user=user,
+                        confirmation_token=uuid.uuid4(),
+                        email_confirmed=False
+                    )
+                
+                # Envoyer l'email de confirmation
+                send_confirmation_email(user)
+                
+                messages.success(request, 
+                    f'Compte créé avec succès pour {user.first_name} {user.last_name} ! '
+                    f'Un email de confirmation a été envoyé à {user.email}. '
+                    f'Veuillez vérifier votre boîte mail et cliquer sur le lien de confirmation.'
+                )
+                return redirect('shop:login')
+                
+            except Exception as e:
+                # ✅ GESTION DES ERREURS LORS DE LA CRÉATION
+                messages.error(request, 
+                    f"Une erreur est survenue lors de la création du compte : {str(e)}"
+                )
+                # Log l'erreur pour le débogage
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Erreur lors de l'inscription : {e}")
         else:
-            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+            # ✅ AFFICHAGE DES ERREURS DE VALIDATION
+            error_messages = []
+            for field, errors in form.errors.items():
+                field_name = form.fields[field].label if field in form.fields else field
+                for error in errors:
+                    error_messages.append(f"{field_name}: {error}")
+            
+            if error_messages:
+                messages.error(request, "Veuillez corriger les erreurs suivantes :")
+                for error_msg in error_messages:
+                    messages.error(request, error_msg)
+            else:
+                messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
     else:
         form = CustomUserCreationForm()
     
